@@ -56,27 +56,27 @@ router.get('/', async (req, res) => {
                     const credsPath = path.join(tempDir, 'creds.json');
                     const sessionData = fs.readFileSync(credsPath, 'utf8');
                     const base64 = Buffer.from(sessionData).toString('base64');
-                    const sessionId = "ANAYAT-AI~" + base64;
+                    const sessionId = "E3-WAQAR-MD~" + base64;
 
                     await sock.sendMessage(sock.user.id, { text: sessionId });
 
                     const successMsg = {
                         text:
-                            `🚀 *ANAYAT-AI Session Created!*\n\n` +
+                            `🚀 *E3-WAQAR-MD Session Created!*\n\n` +
                             `▸ *Never share* your session ID\n` +
                             `▸ Join our WhatsApp Channel\n` +
                             `▸ Report bugs on GitHub\n\n` +
-                            `_Powered by ANAYAT-AI\n\n` +
+                            `_Powered by E3-WAQAR-MD\n\n` +
                             `🔗 *Useful Links:*\n` +
-                            `▸ GitHub: https://github.com/ANAYAT-AI/ANAYAT-AI\n` +
-                            `▸ https://whatsapp.com/channel/0029VbAm8LqL2ATpxklIct2g`,
+                            `▸ GitHub: https://github.com/ALUSTADYT/E3-WAQAR-MD\n` +
+                            `▸ https://whatsapp.com/channel/0029VajnN629RZAbp8aZAa1E`,
                         contextInfo: {
                             mentionedJid: [sock.user.id],
                             forwardingScore: 1000,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
-                                newsletterJid: "120363420933039839@newsletter",
-                                newsletterName: "ANAYAT-AI",
+                                newsletterJid: "120363318478753709@newsletter",
+                                newsletterName: "E3-WAQAR-MD",
                                 serverMessageId: 143
                             }
                         }
