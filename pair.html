@@ -6,46 +6,183 @@
   <title>E3-WAQAR-MD — Pairing Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: 'Orbitron', sans-serif;
-      background: #0e1117;
-      color: #e0e6f0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    :root {
+      --bg-dark: #0e1117;
+      --bg-light: #f3f6fb;
+      --card-dark: rgba(20, 24, 32, 0.9);
+      --card-light: rgba(255, 255, 255, 0.8);
+      --text-dark: #e0e6f0;
+      --text-light: #222;
+      --accent: #3a82f7;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Orbitron', sans-serif; 
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      height: 100vh; transition: background 0.6s, color 0.6s;
+    }
+
+    body.night { background: var(--bg-dark); color: var(--text-dark); }
+    body.day { background: var(--bg-light); color: var(--text-light); }
+
     .card {
-      background: rgba(20, 24, 32, 0.9);
-      padding: 30px;
-      border-radius: 20px;
+      position: relative;
       width: min(600px, 90%);
-      text-align: center;
+      padding: 32px;
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      transition: background 0.6s, box-shadow 0.6s;
+    }
+    body.night .card {
+      background: var(--card-dark);
       box-shadow: 0 6px 20px rgba(0,0,0,0.6);
     }
-    h1 { margin-bottom: 15px; font-size: 28px; }
-    .time {
-      font-size: 18px;
+    body.day .card {
+      background: var(--card-light);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    h1 {
       margin-bottom: 20px;
-      color: #3a82f7;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .time {
+      font-size: 14px;
+      margin-bottom: 25px;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    input, button {
+      width: 100%;
+      max-width: 420px;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+    }
+    input {
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+    body.night input {
+      background: #1a1e28;
+      color: #fff;
+      border: 1px solid #333;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #2a6bd9;
+      transform: translateY(-2px);
+    }
+
+    .output {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #444;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+    .output.show { opacity: 1; }
+
+    .spinner {
+      border: 4px solid rgba(0,0,0,0.1);
+      border-left-color: var(--accent);
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      margin: 10px auto;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .toggle-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #ccc;
+      border: none;
+      border-radius: 50%;
+      width: 42px; height: 42px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    body.night .toggle-btn { background: #222; color: #fff; }
+    body.day .toggle-btn { background: #eee; color: #000; }
+
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      opacity: 0.7;
+      text-align: center;
     }
   </style>
 </head>
-<body>
+<body class="night">
+  <button class="toggle-btn" onclick="toggleMode()">🌙</button>
+
   <main class="card">
     <h1>E3-WAQAR-MD Pairing Dashboard</h1>
     <div class="time" id="timeBox"></div>
+
+    <input type="text" id="number" placeholder="Enter WhatsApp Number (e.g., 923451234567)" />
+    <button onclick="getCode()">Generate Pair Code</button>
+    
+    <div id="result" class="output"></div>
   </main>
 
+  <footer>Powered by E3-WAQAR-MD ©</footer>
+
+  <!-- Allahu Akbar sound -->
+  <audio id="takbir" src="https://www.islamcan.com/audio/adhan/azan1.mp3"></audio>
+
   <script>
+    function toggleMode(){
+      const body=document.body;
+      const btn=document.querySelector(".toggle-btn");
+      if(body.classList.contains("night")){
+        body.classList.remove("night"); body.classList.add("day"); btn.textContent="☀️";
+      } else {
+        body.classList.remove("day"); body.classList.add("night"); btn.textContent="🌙";
+      }
+    }
+
     function updateTime(){
       const now = new Date();
-      document.getElementById("timeBox").textContent = 
-        now.toLocaleString(); // shows date + time
+      document.getElementById("timeBox").textContent = now.toLocaleString();
     }
     setInterval(updateTime, 1000);
-    updateTime(); // call once immediately
+    updateTime();
+
+    async function getCode(){
+      const number = document.getElementById('number').value.trim();
+      const resultBox = document.getElementById('result');
+      const audio = document.getElementById('takbir');
+
+      if(!number){ alert('Please enter a valid number.'); return; }
+
+      resultBox.classList.add('show');
+      resultBox.innerHTML = `<div class="spinner"></div> Generating code...`;
+
+      setTimeout(()=>{
+        const fakeCode = Math.floor(100000 + Math.random() * 900000);
+        resultBox.innerHTML = `✅ Pairing Code: <b>${fakeCode}</b>`;
+        audio.currentTime = 0;
+        audio.play();
+      }, 2500);
+    }
   </script>
 </body>
 </html>
