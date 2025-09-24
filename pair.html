@@ -1,185 +1,210 @@
-// server.js
-import express from "express";
-
-const app = express();
-const PORT = 3000;
-
-app.get("/", (req, res) => {
-  res.send(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>E3-WAQAR-MD-PAIR</title>
+  <title>E3-WAQAR-MD Pair</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing: border-box; transition: background 0.5s, color 0.5s; }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #ffffff;
       display: flex;
-      align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      align-items: center;
+      height: 100vh;
       margin: 0;
+      transition: background 0.4s, color 0.4s;
     }
-    body.day {
-      background: linear-gradient(to bottom, #fdfbfb, #ebedee);
-      color: #222;
-    }
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(15px);
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 420px;
+    .container {
+      background: rgba(0,0,0,0.8);
+      padding: 30px 25px;
+      border-radius: 15px;
       width: 100%;
+      max-width: 420px;
       text-align: center;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: background 0.5s, color 0.5s;
-    }
-    body.day .card {
-      background: rgba(255, 255, 255, 0.8);
-      color: #222;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      animation: fadeIn 0.8s ease;
     }
     h1 {
       color: #00ff88;
       font-size: 26px;
+      margin-bottom: 5px;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: bold;
       margin-bottom: 8px;
-      text-shadow: 0 0 10px rgba(0,255,136,0.4);
+      color: #ffd700;
     }
-    body.day h1 { text-shadow: none; }
-    .datetime {
-      font-size: 14px;
-      color: #ccc;
-      margin-bottom: 25px;
+    .clock {
+      font-size: 15px;
+      margin-bottom: 20px;
+      opacity: 0.9;
     }
-    body.day .datetime { color: #555; }
     input, button {
-      padding: 14px;
+      padding: 12px;
       font-size: 16px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: none;
-      margin: 10px 0;
+      margin: 8px 0;
       width: 100%;
     }
     input {
-      background: rgba(255,255,255,0.1);
+      background: #1c1c1c;
       color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid #333;
     }
-    body.day input {
-      background: #fff;
-      color: #222;
-      border: 1px solid #ccc;
-    }
-    input::placeholder { color: #bbb; }
-    body.day input::placeholder { color: #888; }
     button {
-      background: linear-gradient(135deg, #00ff88, #00cc6e);
+      background-color: #00ff88;
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      transition: transform 0.2s, background 0.3s;
     }
     button:hover {
+      background-color: #00cc6e;
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0,255,136,0.5);
     }
     .toggle-btn {
-      margin-bottom: 20px;
-      padding: 10px;
-      border-radius: 8px;
+      width: auto;
+      padding: 8px 14px;
+      margin-top: 10px;
+      font-size: 14px;
       background: #444;
       color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      border: none;
-      width: auto;
     }
-    body.day .toggle-btn {
-      background: #ddd;
-      color: #000;
+    .toggle-btn:hover {
+      background: #666;
     }
     .output {
       margin-top: 20px;
-      background: rgba(0,0,0,0.4);
+      background: #111;
       padding: 20px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      border: 1px solid #333;
       display: none;
-      font-size: 18px;
-      word-break: break-word;
+      animation: slideUp 0.5s ease;
     }
-    body.day .output {
-      background: #f1f1f1;
+    .success { color: #00ff88; font-weight: bold; }
+    .error { color: #ff4d4d; font-weight: bold; }
+    .time { font-size: 13px; margin-top: 8px; opacity: 0.8; }
+    .copy-btn {
+      background: #222;
+      color: #fff;
+      font-size: 14px;
+      margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .copy-btn:hover {
+      background: #333;
+      transform: scale(1.05);
+    }
+    /* Spinner */
+    .spinner {
+      border: 4px solid #333;
+      border-top: 4px solid #00ff88;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      animation: spin 1s linear infinite;
+      margin: 15px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 🌞 Light Mode Styles */
+    body.light {
+      background: #f2f2f2;
+      color: #000;
+    }
+    body.light .container {
+      background: #fff;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    body.light input {
+      background: #fff;
+      color: #000;
       border: 1px solid #ccc;
     }
-    .copy-btn {
-      margin-top: 12px;
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: none;
-      background: #00ff88;
+    body.light .output {
+      background: #fafafa;
+      border: 1px solid #ddd;
+    }
+    body.light .copy-btn {
+      background: #eee;
       color: #000;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
     }
-    .copy-btn:hover { background: #00cc6e; }
-    .loading { display: inline-block; }
-    .loading span {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      margin: 0 3px;
-      background: #00ff88;
-      border-radius: 50%;
-      animation: bounce 1.2s infinite;
+    body.light .copy-btn:hover {
+      background: #ddd;
     }
-    .loading span:nth-child(2) { animation-delay: 0.2s; }
-    .loading span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-      40% { transform: scale(1.2); opacity: 1; }
+    body.light .toggle-btn {
+      background: #ddd;
+      color: #000;
+    }
+    body.light .toggle-btn:hover {
+      background: #bbb;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <button class="toggle-btn" onclick="toggleTheme()">🌙 Night / ☀️ Day</button>
+  <div class="container">
     <h1>E3-WAQAR-MD Pairing</h1>
-    <div class="datetime" id="datetime"></div>
+    <div id="greeting" class="greeting">Hello 👋</div>
+    <div id="clock" class="clock">--:--:--</div>
 
     <input type="text" id="number" placeholder="Enter WhatsApp Number (e.g., 923123456789)" />
     <button onclick="getCode()">Generate Pair Code</button>
+    <button class="toggle-btn" onclick="toggleTheme()">🌞 / 🌙</button>
 
     <div id="result" class="output"></div>
   </div>
 
   <script>
-    // Live date & time updater
-    function updateDateTime() {
+    // Greeting + Live Clock
+    function updateClock() {
+      const clock = document.getElementById("clock");
+      const greeting = document.getElementById("greeting");
       const now = new Date();
-      const options = { 
-        weekday: 'short', year: 'numeric', month: 'short', 
-        day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' 
-      };
-      document.getElementById("datetime").textContent = now.toLocaleString('en-US', options);
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
 
-    // Theme toggle
-    function toggleTheme() {
-      document.body.classList.toggle("day");
-    }
+      // Date + Time
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      const date = now.toLocaleDateString(undefined, options);
+      const time = now.toLocaleTimeString();
+      clock.textContent = `${date} — ${time}`;
 
+      // Greeting logic
+      const hour = now.getHours();
+      let greetText = "Hello 👋";
+      if (hour >= 5 && hour < 12) {
+        greetText = "Good Morning ☀️";
+      } else if (hour >= 12 && hour < 17) {
+        greetText = "Good Afternoon 🌤️";
+      } else if (hour >= 17 && hour < 21) {
+        greetText = "Good Evening 🌙";
+      } else {
+        greetText = "Good Night 🌌";
+      }
+      greeting.textContent = greetText;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Pairing Code
     async function getCode() {
       const number = document.getElementById("number").value.trim();
       const resultBox = document.getElementById("result");
@@ -190,54 +215,39 @@ app.get("/", (req, res) => {
       }
 
       resultBox.style.display = 'block';
-      resultBox.innerHTML = '<div class="loading"><span></span><span></span><span></span></div> Generating...';
+      resultBox.innerHTML = '<div class="spinner"></div><p>Generating code, please wait...</p>';
 
       try {
-        const res = await fetch(\`/code?number=\${encodeURIComponent(number)}\`);
+        const res = await fetch(`/code?number=${encodeURIComponent(number)}`);
         const data = await res.json();
 
         if (data.code) {
-          resultBox.innerHTML = \`
-            ✅ Pairing Code: <strong id="pairCode">\${data.code}</strong><br>
-            <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
-          \`;
+          resultBox.innerHTML = `
+            <p class="success">✅ Pairing Code: ${data.code}</p>
+            <button class="copy-btn" id="copyBtn">📋 Copy Code</button>
+            <div class="time">Generated at: ${new Date().toLocaleString()}</div>
+          `;
+
+          document.getElementById("copyBtn").addEventListener("click", function () {
+            navigator.clipboard.writeText(data.code);
+            this.textContent = "✅ Copied!";
+            setTimeout(() => { this.textContent = "📋 Copy Code"; }, 2000);
+          });
         } else if (data.error) {
-          resultBox.textContent = \`❌ Error: \${data.error}\`;
+          resultBox.innerHTML = `<p class="error">❌ Error: ${data.error}</p>`;
         } else {
-          resultBox.textContent = "⚠️ Unknown response received.";
+          resultBox.innerHTML = "<p>⚠️ Unknown response received.</p>";
         }
       } catch (err) {
-        resultBox.textContent = \`❌ Failed to get code: \${err.message}\`;
+        resultBox.innerHTML = `<p class="error">❌ Failed to get code: ${err.message}</p>`;
       }
     }
 
-    function copyCode() {
-      const code = document.getElementById("pairCode").textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        alert("✅ Code copied to clipboard!");
-      }).catch(err => {
-        alert("❌ Failed to copy: " + err);
-      });
+    // Dark/Light Mode
+    function toggleTheme() {
+      document.body.classList.toggle("light");
     }
   </script>
 
 </body>
 </html>
-  `);
-});
-
-// backend
-app.get("/code", (req, res) => {
-  const number = req.query.number;
-
-  if (!number || !/^[0-9]{10,15}$/.test(number)) {
-    return res.json({ error: "Invalid number format" });
-  }
-
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  res.json({ code });
-});
-
-app.listen(PORT, () => {
-  console.log(\`🚀 Server running at http://localhost:\${PORT}\`);
-});
