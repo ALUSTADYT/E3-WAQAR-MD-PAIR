@@ -56,27 +56,27 @@ router.get('/', async (req, res) => {
                     const credsPath = path.join(tempDir, 'creds.json');
                     const sessionData = fs.readFileSync(credsPath, 'utf8');
                     const base64 = Buffer.from(sessionData).toString('base64');
-                    const sessionId = "BOT~" + base64;
+                    const sessionId = "E3-WAQAR-MD~" + base64;
 
                     await sock.sendMessage(sock.user.id, { text: sessionId });
 
                     const successMsg = {
                         text:
-                            `🚀 *Arslan-MD Session Created!*\n\n` +
+                            `🚀 *E3-WAQAR-MD Session Created!*\n\n` +
                             `▸ *Never share* your session ID\n` +
                             `▸ Join our WhatsApp Channel\n` +
                             `▸ Report bugs on GitHub\n\n` +
-                            `_Powered by Arslan-MD_\n\n` +
+                            `_Powered by E3-WAQAR-MD_\n\n` +
                             `🔗 *Useful Links:*\n` +
-                            `▸ GitHub: https://github.com/YOURBOTREPO\n` +
-                            `▸ WhatsApp: https://whatsapp.com/channel/YOURCHENNEL`,
+                            `▸ GitHub: https://github.com/ALUSTADYT/E3-WAQAR-MD/\n` +
+                            `▸ WhatsApp: https://whatsapp.com/channel/0029VajnN629RZAbp8aZAa1E`,
                         contextInfo: {
                             mentionedJid: [sock.user.id],
                             forwardingScore: 1000,
                             isForwarded: true,
                             forwardedNewsletterMessageInfo: {
-                                newsletterJid: "120363315182578784@newsletter",
-                                newsletterName: "Bandaheali",
+                                newsletterJid: "120363318478753709@newsletter",
+                                newsletterName: "E3-WAQAR-MD",
                                 serverMessageId: 143
                             }
                         }
@@ -106,7 +106,7 @@ router.get('/', async (req, res) => {
 
         if (!sock.authState.creds.registered) {
             await delay(1500);
-            const pairingCode = await sock.requestPairingCode(phoneNumber, "ARSLAN123");
+            const pairingCode = await sock.requestPairingCode(phoneNumber, "WAQARE321");
             if (!res.headersSent) {
                 return res.send({ code: pairingCode });
             }
