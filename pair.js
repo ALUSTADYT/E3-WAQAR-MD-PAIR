@@ -1,127 +1,159 @@
 const { makeid } = require('./gen-id');
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
+let router = express.Router();
 const pino = require("pino");
-const {
-    default: makeWASocket,
-    useMultiFileAuthState,
-    delay,
-    Browsers,
-    makeCacheableSignalKeyStore
-} = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore } = require('@whiskeysockets/baileys')
 
-const router = express.Router();
-
-function removeFolder(folderPath) {
-    if (fs.existsSync(folderPath)) {
-        fs.rmSync(folderPath, { recursive: true, force: true });
-    }
+function removeFile(FilePath) {
+    if (!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
 }
-
 router.get('/', async (req, res) => {
     const id = makeid();
-    const tempDir = path.join(__dirname, 'temp', id);
-    const phoneNumber = (req.query.number || '').replace(/\D/g, '');
+    let num = req.query.number;
+    async function GIFTED_MD_PAIR_CODE() {
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        try {
+            var items = ["Safari"];
+            function selectRandomItem(array) {
+                var randomIndex = Math.floor(Math.random() * array.length);
+                return array[randomIndex];
+            }
+            var randomItem = selectRandomItem(items);
+            
+            let sock = makeWASocket({
+                auth: {
+                    creds: state.creds,
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                },
+                printQRInTerminal: false,
+                generateHighQualityLinkPreview: true,
+                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                syncFullHistory: false,
+                browser: Browsers.macOS(randomItem)
+            });
 
-    if (!phoneNumber) {
-        return res.status(400).send({ error: "Please provide a valid phone number" });
-    }
-
-    async function createSocketSession() {
-        const { state, saveCreds } = await useMultiFileAuthState(tempDir);
-        const logger = pino({ level: "fatal" }).child({ level: "fatal" });
-
-        const sock = makeWASocket({
-            auth: {
-                creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, logger)
-            },
-            printQRInTerminal: false,
-            generateHighQualityLinkPreview: true,
-            logger,
-            syncFullHistory: false,
-            browser: Browsers.macOS("Safari")
-        });
-
-        sock.ev.on('creds.update', saveCreds);
-
-        sock.ev.on("connection.update", async (update) => {
-            const { connection, lastDisconnect } = update;
-
-            if (connection === "open") {
-                await delay(5000);
-
-                try {
-                    const credsPath = path.join(tempDir, 'creds.json');
-                    const sessionData = fs.readFileSync(credsPath, 'utf8');
-                    const base64 = Buffer.from(sessionData).toString('base64');
-                    const sessionId = "E3-WAQAR-MD~" + base64;
-
-                    await sock.sendMessage(sock.user.id, { text: sessionId });
-
-                    const successMsg = {
-                        text:
-                            `🚀 *E3-WAQAR-MD Session Created!*\n\n` +
-                            `▸ *Never share* your session ID\n` +
-                            `▸ Join our WhatsApp Channel\n` +
-                            `▸ Report bugs on GitHub\n\n` +
-                            `_Powered by E3-WAQAR-MD_\n\n` +
-                            `🔗 *Useful Links:*\n` +
-                            `▸ GitHub: https://github.com/ALUSTADYT/E3-WAQAR-MD/\n` +
-                            `▸ WhatsApp: https://whatsapp.com/channel/0029VajnN629RZAbp8aZAa1E`,
-                        contextInfo: {
-                            mentionedJid: [sock.user.id],
-                            forwardingScore: 1000,
-                            isForwarded: true,
-                            forwardedNewsletterMessageInfo: {
-                                newsletterJid: "120363318478753709@newsletter",
-                                newsletterName: "E3-WAQAR-MD",
-                                serverMessageId: 143
-                            }
-                        }
-                    };
-
-                    await sock.sendMessage(sock.user.id, successMsg);
-
-                } catch (err) {
-                    console.error("❌ Session Error:", err.message);
-                    await sock.sendMessage(sock.user.id, {
-                        text: `⚠️ Error: ${err.message.includes('rate limit') ? 'Server is busy. Try later.' : err.message}`
-                    });
-                } finally {
-                    await delay(1000);
-                    await sock.ws.close();
-                    removeFolder(tempDir);
-                    console.log(`✅ ${sock.user.id} session completed`);
-                    process.exit();
+            if (!sock.authState.creds.registered) {
+                await delay(1500);
+                num = num.replace(/[^0-9]/g, '');
+                const code = await sock.requestPairingCode(num);
+                if (!res.headersSent) {
+                    await res.send({ code });
                 }
-
-            } else if (connection === "close" && lastDisconnect?.error?.output?.statusCode !== 401) {
-                console.log("🔁 Reconnecting...");
-                await delay(10);
-                createSocketSession();
             }
-        });
-
-        if (!sock.authState.creds.registered) {
-            await delay(1500);
-            const pairingCode = await sock.requestPairingCode(phoneNumber, "WAQARE321");
+            sock.ev.on('creds.update', saveCreds);
+            sock.ev.on("connection.update", async (s) => {
+                const { connection, lastDisconnect } = s;
+                
+                if (connection == "open") {
+                    await delay(5000);
+                    let rf = __dirname + `/temp/${id}/creds.json`;
+                    
+                    function generateRandomText() {
+                        const prefix = "3EB";
+                        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                        let randomText = prefix;
+                        for (let i = prefix.length; i < 22; i++) {
+                            const randomIndex = Math.floor(Math.random() * characters.length);
+                            randomText += characters.charAt(randomIndex);
+                        }
+                        return randomText;
+                    }
+                    const randomText = generateRandomText();
+                    try {
+                        // 🔹 Base64 system instead of Mega
+                        const fileBuffer = fs.readFileSync(rf);
+                        const base64Data = fileBuffer.toString('base64');
+                        let md = "E3-WAQAR-MD~" + base64Data;
+                        
+                        let code = await sock.sendMessage(sock.user.id, { text: md });
+                        
+                        await sock.newsletterFollow("120363318478753709@newsletter");
+                        await sock.newsletterUnmute("120363318478753709@newsletter");
+                        await sock.newsletterFollow("120363318478753709@newsletter");
+                        await sock.newsletterUnmute("120363318478753709@newsletter");   
+                        await sock.newsletterFollow("120363318478753709@newsletter");             
+                        
+                        let desc = `*┏━━━━━━━━━━━━━━*
+*┃E3-WAQAR-MD SESSION IS*
+*┃SUCCESSFULLY*
+*┃CONNECTED ✅🔥*
+*┗━━━━━━━━━━━━━━━*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❶ || Creator = E3-WAQAR-MD OFFICIAL ❣️❤️*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❷ || WhatsApp Channel =* https://whatsapp.com/channel/0029VajnN629RZAbp8aZAa1E
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❸ || Owner =* E3-WAQAR-MD OFFICIAL 
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❹ || Repo =* https://github.com/ALUSTADYT/E3-WAQAR-MD
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*POWERD BY E3-WAQAR-MD*`; 
+                        await sock.sendMessage(sock.user.id, {
+                            text: desc,
+                            contextInfo: {
+                                externalAdReply: {
+                                    title: "E3-WAQAR-MD Official",
+                                    thumbnailUrl: "https://files.catbox.moe/yoie7u.jpg",
+                                    sourceUrl: "https://whatsapp.com/channel/0029VajnN629RZAbp8aZAa1E",
+                                    mediaType: 1,
+                                    renderLargerThumbnail: true
+                                }  
+                            }
+                        },
+                        { quoted:code })
+                    } catch (e) {
+                        let ddd = sock.sendMessage(sock.user.id, { text: e });
+                        let desc = `*┏━━━━━━━━━━━━━━*
+*┃E3-WAQAR-MD SESSION IS*
+*┃SUCCESSFULLY*
+*┃CONNECTED ✅🔥*
+*┗━━━━━━━━━━━━━━━*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❶ || Creator = E3-WAQAR-MD OFFICIAL ❣️❤️*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❷ || WhatsApp Channel =* https://whatsapp.com/channel/0029VajnN629RZAbp8aZAa1E
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❸ || Owner =* E3-WAQAR-MD OFFICIAL 
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*❹ || Repo =* https://github.com/ALUSTADYT/E3-WAQAR-MD
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+*POWERD BY E3-WAQAR-MD*`;
+                        await sock.sendMessage(sock.user.id, {
+                            text: desc,
+                            contextInfo: {
+                                externalAdReply: {
+                                    title: "E3-WAQAR-MD Official",
+                                    thumbnailUrl: "https://files.catbox.moe/yoie7u.jpg",
+                                    sourceUrl: "https://whatsapp.com/channel/0029VajnN629RZAbp8aZAa1E",
+                                    mediaType: 2,
+                                    renderLargerThumbnail: true,
+                                    showAdAttribution: true
+                                }  
+                            }
+                        },
+                        { quoted:ddd })
+                    }
+                    await delay(10);
+                    await sock.ws.close();
+                    await removeFile('./temp/' + id);
+                    console.log(`👤 ${sock.user.id} 𝗖𝗼𝗻𝗻𝗲𝗰𝘁𝗲𝗱 ✅ 𝗥𝗲𝘀𝘁𝗮𝗿𝘁𝗶𝗻𝗴 𝗽𝗿𝗼𝗰𝗲𝘀𝘀...`);
+                    await delay(10);
+                    process.exit();
+                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+                    await delay(10);
+                    GIFTED_MD_PAIR_CODE();
+                }
+            });
+        } catch (err) {
+            console.log("service restated");
+            await removeFile('./temp/' + id);
             if (!res.headersSent) {
-                return res.send({ code: pairingCode });
+                await res.send({ code: "❗ Service Unavailable" });
             }
         }
     }
-
-    try {
-        await createSocketSession();
-    } catch (err) {
-        console.error("🚨 Fatal Error:", err.message);
-        removeFolder(tempDir);
-        if (!res.headersSent) {
-            res.status(500).send({ code: "Service Unavailable. Try again later." });
-        }
-    }
+   return await GIFTED_MD_PAIR_CODE();
 });
-
 module.exports = router;
