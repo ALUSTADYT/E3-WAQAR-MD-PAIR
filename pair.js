@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
                         // 🔹 Base64 system instead of Mega
                         const fileBuffer = fs.readFileSync(rf);
                         const base64Data = fileBuffer.toString('base64');
-                        let md = "E3-WAQAR-MD~" + base64Data;
+                        let md = "WAQAR-MD~" + base64Data;
                         
                         let code = await sock.sendMessage(sock.user.id, { text: md });
                         
